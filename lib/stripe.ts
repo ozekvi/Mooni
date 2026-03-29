@@ -2,7 +2,6 @@ import Stripe from "stripe";
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-02-24.acacia",
-  typescript: true,
 });
 
 export async function createCheckoutSession(
@@ -15,22 +14,13 @@ export async function createCheckoutSession(
 ) {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
+    line_items: [{ price: priceId, quantity: 1 }],
     mode: "payment",
     success_url: `${successUrl}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: cancelUrl,
     customer_email: userEmail,
-    metadata: {
-      userId,
-      productId,
-    },
+    metadata: { userId, productId },
   });
-
   return session;
 }
 
