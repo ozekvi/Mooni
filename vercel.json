@@ -1,24 +1,5 @@
 {
   "framework": "nextjs",
   "buildCommand": "prisma generate && next build",
-  "devCommand": "next dev",
-  "installCommand": "npm install",
-  "regions": ["fra1"],
-  "env": {
-    "NEXTAUTH_URL": "@nextauth_url",
-    "NEXTAUTH_SECRET": "@nextauth_secret",
-    "DATABASE_URL": "@database_url",
-    "DISCORD_CLIENT_ID": "@discord_client_id",
-    "DISCORD_CLIENT_SECRET": "@discord_client_secret",
-    "DISCORD_BOT_TOKEN": "@discord_bot_token",
-    "DISCORD_GUILD_ID": "@discord_guild_id",
-    "DISCORD_ADMIN_ROLE_ID": "@discord_admin_role_id",
-    "RESEND_API_KEY": "@resend_api_key",
-    "EMAIL_FROM": "@email_from",
-    "STRIPE_SECRET_KEY": "@stripe_secret_key",
-    "STRIPE_PUBLISHABLE_KEY": "@stripe_publishable_key",
-    "STRIPE_WEBHOOK_SECRET": "@stripe_webhook_secret",
-    "NEXT_PUBLIC_APP_URL": "@next_public_app_url",
-    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "@next_public_stripe_publishable_key"
-  }
+  "installCommand": "npm install"
 }
