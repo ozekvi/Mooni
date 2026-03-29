@@ -39,7 +39,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         );
 
         if (!isValid) return null;
-        return user;
+
+        // Map Prisma nulls to undefined to satisfy NextAuth User type
+        return {
+          id: user.id,
+          email: user.email ?? undefined,
+          name: user.name ?? undefined,
+          image: user.image ?? undefined,
+          role: user.role,
+          discordId: user.discordId ?? undefined,
+        };
       },
     }),
   ],
