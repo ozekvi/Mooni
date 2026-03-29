@@ -24,146 +24,96 @@ const categoryIcons: Record<string, React.ReactNode> = {
   vip: <Crown size={20} />,
 };
 
-const defaultServices = [
-  {
-    id: "1",
-    name: "Power Leveling",
-    description: "Rapidly boost your commander levels with our expert farming teams. Reach your target power in record time.",
-    price: 29.99,
-    currency: "usd",
-    category: "leveling",
-  },
-  {
-    id: "2",
-    name: "Gem Farming",
-    description: "Maximize your gem income with daily farming strategies and optimized resource gathering routes.",
-    price: 19.99,
-    currency: "usd",
-    category: "gems",
-  },
-  {
-    id: "3",
-    name: "Alliance Boost",
-    description: "Full alliance support including territory control, rally coordination, and leadership guidance.",
-    price: 49.99,
-    currency: "usd",
-    category: "alliance",
-  },
-  {
-    id: "4",
-    name: "KvK Strategy",
-    description: "Elite Kingdom vs Kingdom preparation and execution strategies from veteran players.",
-    price: 39.99,
-    currency: "usd",
-    category: "pvp",
-  },
-  {
-    id: "5",
-    name: "Troop Training",
-    description: "Optimize your troop composition and training queue for maximum combat effectiveness.",
-    price: 24.99,
-    currency: "usd",
-    category: "defense",
-  },
-  {
-    id: "6",
-    name: "VIP Account Management",
-    description: "Full account management service with daily tasks, events, and resource optimization.",
-    price: 89.99,
-    currency: "usd",
-    category: "vip",
-  },
+const defaultServices: Product[] = [
+  { id: "1", name: "Power Leveling", description: "Rapidly boost your commander levels with our expert farming teams. Reach your target power in record time.", price: 29.99, currency: "usd", category: "leveling" },
+  { id: "2", name: "Gem Farming", description: "Maximize your gem income with daily farming strategies and optimized resource gathering routes.", price: 19.99, currency: "usd", category: "gems" },
+  { id: "3", name: "Alliance Boost", description: "Full alliance support including territory control, rally coordination, and leadership guidance.", price: 49.99, currency: "usd", category: "alliance" },
+  { id: "4", name: "KvK Strategy", description: "Elite Kingdom vs Kingdom preparation and execution strategies from veteran players.", price: 39.99, currency: "usd", category: "pvp" },
+  { id: "5", name: "Troop Training", description: "Optimize your troop composition and training queue for maximum combat effectiveness.", price: 24.99, currency: "usd", category: "defense" },
+  { id: "6", name: "VIP Account Management", description: "Full account management service with daily tasks, events, and resource optimization.", price: 89.99, currency: "usd", category: "vip" },
 ];
 
 export default function ServicesSection({ theme }: { theme: "dark" | "light" }) {
   const [products, setProducts] = useState<Product[]>(defaultServices);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/products")
       .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setProducts(data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then((data) => { if (Array.isArray(data) && data.length > 0) setProducts(data); })
+      .catch(() => {});
   }, []);
+
+  const isDark = theme === "dark";
 
   return (
     <section
       id="services"
-      className="relative py-32 px-6"
       style={{
-        background:
-          theme === "dark"
-            ? "linear-gradient(180deg, #09030f 0%, #0f051a 50%, #09030f 100%)"
-            : "linear-gradient(180deg, #f8f5ff 0%, #f3e8ff 50%, #f8f5ff 100%)",
+        position: "relative",
+        padding: "120px 24px",
+        background: isDark
+          ? "linear-gradient(180deg, #09030f 0%, #0f051a 50%, #09030f 100%)"
+          : "linear-gradient(180deg, #f8f5ff 0%, #f3e8ff 50%, #f8f5ff 100%)",
       }}
     >
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] rounded-full opacity-10"
-          style={{
-            background: "radial-gradient(ellipse, #7c22d4 0%, transparent 70%)",
-          }}
-        />
-      </div>
+      {/* bg glow */}
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden",
+        background: "radial-gradient(ellipse at 50% 50%, rgba(124,34,212,0.08) 0%, transparent 70%)",
+      }} />
 
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section header */}
-        <div className="text-center mb-20">
-          <div
-            className={cn(
-              "inline-flex items-center gap-2 text-xs tracking-[0.4em] uppercase font-body mb-4 px-4 py-2 rounded-full border",
-              theme === "dark"
-                ? "text-purple-400 border-purple-800/50 bg-purple-900/20"
-                : "text-purple-600 border-purple-200 bg-purple-50"
-            )}
-          >
-            <Star size={12} /> Our Services
+      <div style={{ position: "relative", maxWidth: 1200, margin: "0 auto" }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 72 }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            fontSize: 11, letterSpacing: "0.4em", textTransform: "uppercase",
+            padding: "6px 16px", borderRadius: 999,
+            border: `1px solid ${isDark ? "rgba(124,34,212,0.4)" : "rgba(167,139,250,0.4)"}`,
+            background: isDark ? "rgba(88,28,135,0.15)" : "rgba(233,213,255,0.4)",
+            color: isDark ? "#a78bfa" : "#7c3aed",
+            marginBottom: 20,
+          }}>
+            <Star size={11} /> Our Services
           </div>
-          <h2
-            className="font-display font-bold text-4xl md:text-5xl mb-4"
-            style={{
-              background:
-                theme === "dark"
-                  ? "linear-gradient(135deg, #f3e8ff 0%, #c084fc 60%)"
-                  : "linear-gradient(135deg, #4c1d95 0%, #7c22d4 60%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
+
+          <h2 style={{
+            fontFamily: "var(--font-cinzel), serif",
+            fontWeight: 700, fontSize: "clamp(32px, 5vw, 48px)",
+            background: isDark
+              ? "linear-gradient(135deg, #f3e8ff 0%, #c084fc 60%)"
+              : "linear-gradient(135deg, #4c1d95 0%, #7c22d4 60%)",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            margin: "0 0 16px",
+          }}>
             Rise to Power
           </h2>
-          <p
-            className={cn(
-              "font-body text-lg max-w-xl mx-auto",
-              theme === "dark" ? "text-purple-300/70" : "text-purple-500"
-            )}
-          >
+          <p style={{ fontSize: 18, color: isDark ? "rgba(167,139,250,0.7)" : "#7c3aed", maxWidth: 480, margin: "0 auto" }}>
             Professional Rise of Kingdoms services tailored to your goals
           </p>
         </div>
 
-        {/* Products grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product, idx) => (
-            <ServiceCard key={product.id} product={product} theme={theme} index={idx} />
+        {/* Grid — inline CSS so it always works */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+          gap: 24,
+        }}>
+          {products.map((product) => (
+            <ServiceCard key={product.id} product={product} isDark={isDark} />
           ))}
         </div>
 
-        {/* CTA */}
-        <div className="text-center mt-16">
-          <Link
-            href="/services"
-            className={cn(
-              "inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium border transition-all duration-300",
-              theme === "dark"
-                ? "border-purple-700 text-purple-300 hover:border-purple-500 hover:bg-purple-900/20"
-                : "border-purple-300 text-purple-700 hover:border-purple-500 hover:bg-purple-50"
-            )}
-          >
+        <div style={{ textAlign: "center", marginTop: 56 }}>
+          <Link href="/services" style={{
+            display: "inline-block",
+            padding: "12px 28px", borderRadius: 12,
+            border: `1px solid ${isDark ? "rgba(124,34,212,0.5)" : "rgba(167,139,250,0.5)"}`,
+            color: isDark ? "#c084fc" : "#7c22d4",
+            fontSize: 14, fontWeight: 500,
+            textDecoration: "none",
+            transition: "all 0.2s",
+          }}>
             View all services →
           </Link>
         </div>
@@ -172,99 +122,88 @@ export default function ServicesSection({ theme }: { theme: "dark" | "light" }) 
   );
 }
 
-function ServiceCard({
-  product,
-  theme,
-  index,
-}: {
-  product: Product;
-  theme: "dark" | "light";
-  index: number;
-}) {
+function ServiceCard({ product, isDark }: { product: Product; isDark: boolean }) {
   const icon = product.category ? categoryIcons[product.category] : <Star size={20} />;
+  const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      className={cn(
-        "group relative rounded-2xl border p-6 transition-all duration-500 cursor-pointer overflow-hidden",
-        theme === "dark"
-          ? "bg-gradient-to-br from-dark-100/80 to-dark-200/60 border-purple-900/40 hover:border-purple-700/60"
-          : "bg-white/80 border-purple-100 hover:border-purple-300"
-      )}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        boxShadow:
-          theme === "dark"
-            ? "0 4px 30px rgba(0,0,0,0.4)"
-            : "0 4px 20px rgba(147,51,234,0.08)",
+        borderRadius: 20,
+        border: `1px solid ${hovered
+          ? "rgba(124,34,212,0.6)"
+          : isDark ? "rgba(59,7,100,0.5)" : "rgba(216,180,254,0.5)"}`,
+        padding: 24,
+        background: isDark
+          ? "linear-gradient(135deg, rgba(26,10,46,0.85), rgba(15,5,26,0.7))"
+          : "rgba(255,255,255,0.9)",
+        boxShadow: hovered
+          ? "0 8px 40px rgba(124,34,212,0.2)"
+          : isDark ? "0 4px 30px rgba(0,0,0,0.4)" : "0 4px 20px rgba(147,51,234,0.08)",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        transition: "all 0.3s ease",
+        cursor: "default",
+        display: "flex",
+        flexDirection: "column",
+        gap: 0,
       }}
     >
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse at 50% 0%, rgba(124,34,212,0.12) 0%, transparent 70%)",
-        }}
-      />
-
       {/* Top row */}
-      <div className="flex items-start justify-between mb-4">
-        <div
-          className={cn(
-            "p-2.5 rounded-xl",
-            theme === "dark"
-              ? "bg-purple-900/40 text-purple-400"
-              : "bg-purple-100 text-purple-600"
-          )}
-        >
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{
+          padding: 10, borderRadius: 12,
+          background: "rgba(124,34,212,0.2)",
+          color: "#a855f7",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
           {icon}
         </div>
-        <span
-          className="font-display font-bold text-xl"
-          style={{
-            background: "linear-gradient(135deg, #c084fc, #a855f7)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
+        <span style={{
+          fontFamily: "var(--font-cinzel), serif",
+          fontWeight: 700, fontSize: 20,
+          background: "linear-gradient(135deg, #c084fc, #a855f7)",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+        }}>
           {formatPrice(product.price, product.currency)}
         </span>
       </div>
 
-      {/* Content */}
-      <h3
-        className={cn(
-          "font-display font-semibold text-lg mb-2",
-          theme === "dark" ? "text-purple-100" : "text-purple-900"
-        )}
-      >
+      {/* Name */}
+      <h3 style={{
+        fontFamily: "var(--font-cinzel), serif",
+        fontWeight: 600, fontSize: 17, marginBottom: 10,
+        color: isDark ? "#f3e8ff" : "#3b0764",
+      }}>
         {product.name}
       </h3>
-      <p
-        className={cn(
-          "font-body text-sm leading-relaxed mb-6",
-          theme === "dark" ? "text-purple-300/60" : "text-purple-500"
-        )}
-      >
+
+      {/* Description */}
+      <p style={{
+        fontSize: 14, lineHeight: 1.6, marginBottom: 24,
+        color: isDark ? "rgba(167,139,250,0.65)" : "#7c3aed",
+        flex: 1,
+      }}>
         {product.description}
       </p>
 
-      {/* Buy button */}
+      {/* Button */}
       <Link
         href="/auth/signup"
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-300 group-hover:shadow-lg"
         style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          width: "100%", padding: "12px 0", borderRadius: 12,
           background: "linear-gradient(135deg, #7c22d4, #a855f7)",
-          boxShadow: "0 0 0 rgba(168,85,247,0)",
+          boxShadow: "0 4px 15px rgba(168,85,247,0.3)",
+          color: "white", fontSize: 14, fontWeight: 600,
+          textDecoration: "none",
+          transition: "opacity 0.2s",
         }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.boxShadow = "0 0 20px rgba(168,85,247,0.5)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 rgba(168,85,247,0)";
-        }}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
       >
-        <ShoppingCart size={15} />
-        Order Now
+        <ShoppingCart size={15} /> Order Now
       </Link>
     </div>
   );

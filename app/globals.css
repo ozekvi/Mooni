@@ -1,13 +1,73 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --font-cinzel: 'Cinzel', serif;
-  --font-raleway: 'Raleway', sans-serif;
-  --font-fira-code: 'Fira Code', monospace;
+@theme {
+  /* Fonts */
+  --font-display: var(--font-cinzel), serif;
+  --font-body: var(--font-raleway), sans-serif;
+  --font-mono: var(--font-fira-code), monospace;
+
+  /* Colors */
+  --color-primary-50: #f5f0ff;
+  --color-primary-100: #ede0ff;
+  --color-primary-200: #dcc5ff;
+  --color-primary-300: #c49aff;
+  --color-primary-400: #a855f7;
+  --color-primary-500: #9333ea;
+  --color-primary-600: #7c22d4;
+  --color-primary-700: #6b21a8;
+  --color-primary-800: #581c87;
+  --color-primary-900: #3b0764;
+  --color-primary-950: #1e003d;
+  --color-dark-50: #1a0a2e;
+  --color-dark-100: #150825;
+  --color-dark-200: #0f051a;
+  --color-dark-300: #09030f;
+  --color-dark-400: #060208;
+
+  /* Animations */
+  --animate-moon-float: moonFloat 6s ease-in-out infinite;
+  --animate-moon-glow: moonGlow 3s ease-in-out infinite alternate;
+  --animate-star-twinkle: starTwinkle 2s ease-in-out infinite;
+  --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
+  --animate-fade-in: fadeIn 1s ease-out forwards;
+  --animate-pulse-glow: pulseGlow 2s ease-in-out infinite;
+  --animate-orbit: orbit 20s linear infinite;
+
+  @keyframes moonFloat {
+    0%, 100% { transform: translateY(0px) rotate(-3deg); }
+    50% { transform: translateY(-18px) rotate(3deg); }
+  }
+  @keyframes moonGlow {
+    0% { filter: drop-shadow(0 0 20px rgba(168,85,247,0.6)); }
+    100% { filter: drop-shadow(0 0 40px rgba(192,132,252,0.9)); }
+  }
+  @keyframes starTwinkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.2; transform: scale(0.7); }
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px rgba(168,85,247,0.3); }
+    50% { box-shadow: 0 0 40px rgba(168,85,247,0.7), 0 0 60px rgba(168,85,247,0.3); }
+  }
+  @keyframes orbit {
+    0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
 }
 
+/* Also define keyframes at root level for inline style usage */
 @keyframes moonFloat {
   0%, 100% { transform: translateY(0px) rotate(-3deg); }
   50% { transform: translateY(-18px) rotate(3deg); }
@@ -29,7 +89,7 @@
   50% { box-shadow: 0 0 40px rgba(168,85,247,0.7), 0 0 60px rgba(168,85,247,0.3); }
 }
 @keyframes orbit {
-  0%   { transform: rotate(0deg)   translateX(100px) rotate(0deg); }
+  0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
   100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
 }
 
@@ -39,12 +99,7 @@ html { scroll-behavior: smooth; }
 body {
   background-color: #09030f;
   color: #f3e8ff;
-  font-family: var(--font-raleway), 'Raleway', sans-serif;
 }
-
-.font-display { font-family: var(--font-cinzel), 'Cinzel', serif; }
-.font-body    { font-family: var(--font-raleway), 'Raleway', sans-serif; }
-.font-mono    { font-family: var(--font-fira-code), 'Fira Code', monospace; }
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #09030f; }
