@@ -1,143 +1,111 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import { formatPrice } from "@/lib/utils";
-import { ShoppingCart, Gem, Zap, Swords, Users, Crown, Shield, Star, Filter } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ShoppingCart, Gem, Zap, Swords, Users, Crown, Shield, Star } from "lucide-react";
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  leveling: <Zap size={22} />, gems: <Gem size={22} />, alliance: <Users size={22} />,
-  pvp: <Swords size={22} />, defense: <Shield size={22} />, vip: <Crown size={22} />,
+const icons: Record<string, React.ReactNode> = {
+  leveling: <Zap size={22}/>, gems: <Gem size={22}/>, alliance: <Users size={22}/>,
+  pvp: <Swords size={22}/>, defense: <Shield size={22}/>, vip: <Crown size={22}/>,
 };
 
 export default function ServicesPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [products, setProducts] = useState<any[]>([]);
   const [filter, setFilter] = useState("all");
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem("mooni-theme") as "dark" | "light" | null;
-    if (saved) setTheme(saved);
-    fetch("/api/products").then(r => r.json()).then(d => { if (Array.isArray(d)) setProducts(d); });
+    fetch("/api/products").then(r => r.json()).then(d => {
+      if (Array.isArray(d)) setProducts(d);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem("mooni-theme", next);
-  };
-
-  const categories = ["all", ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
+  const categories = ["all", ...Array.from(new Set(products.map(p => p.category).filter(Boolean))) as string[]];
   const filtered = filter === "all" ? products : products.filter(p => p.category === filter);
 
   const handleBuy = async (productId: string) => {
     if (!session) { router.push("/auth/login"); return; }
     setBuyingId(productId);
     try {
-      const res = await fetch("/api/checkout", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId }),
-      });
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId }) });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
+      else setBuyingId(null);
     } catch { setBuyingId(null); }
   };
 
-  const isDark = theme === "dark";
-
   return (
-    <div style={{ backgroundColor: isDark ? "#09030f" : "#f8f5ff", color: isDark ? "#f3e8ff" : "#3b0764", minHeight: "100vh" }}>
-      <Navbar theme={theme} onToggleTheme={toggleTheme} />
+    <div style={{ minHeight: "100vh", background: "#09030f", color: "#f3e8ff", fontFamily: "var(--font-raleway), sans-serif" }}>
+      <Navbar />
 
-      <div className="max-w-7xl mx-auto px-6 pt-32 pb-20">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="font-display font-bold text-5xl mb-4"
-            style={{ background: isDark ? "linear-gradient(135deg,#f3e8ff,#c084fc)" : "linear-gradient(135deg,#4c1d95,#7c22d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            All Services
-          </h1>
-          <p className="font-body text-lg max-w-xl mx-auto" style={{ color: isDark ? "rgba(167,139,250,0.7)" : "#7c3aed" }}>
-            Premium Rise of Kingdoms services · Secure payments via Stripe
-          </p>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "110px 24px 80px" }}>
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <h1 style={{ fontFamily: "var(--font-cinzel), serif", fontWeight: 700, fontSize: "clamp(36px,7vw,54px)", background: "linear-gradient(135deg,#f3e8ff,#c084fc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 14 }}>All Services</h1>
+          <p style={{ fontSize: 16, color: "rgba(167,139,250,0.65)", maxWidth: 460, margin: "0 auto" }}>Premium Rise of Kingdoms services · Secure payments via Stripe</p>
         </div>
 
-        {/* Filters */}
+        {/* Filter pills */}
         {categories.length > 1 && (
-          <div className="flex flex-wrap gap-2 mb-10 justify-center">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginBottom: 44 }}>
             {categories.map(cat => (
               <button key={cat} onClick={() => setFilter(cat)}
-                className={cn("px-4 py-2 rounded-xl text-sm font-medium capitalize transition-all",
-                  filter === cat ? "text-white" : isDark ? "border border-purple-800/60 text-purple-400 hover:border-purple-600" : "border border-purple-200 text-purple-600 hover:border-purple-400")}
-                style={filter === cat ? { background: "linear-gradient(135deg,#7c22d4,#a855f7)" } : {}}>
+                style={{ padding: "8px 20px", borderRadius: 999, fontSize: 13, fontWeight: 500, cursor: "pointer", textTransform: "capitalize", border: "none", transition: "all 0.2s",
+                  background: filter === cat ? "linear-gradient(135deg,#7c22d4,#a855f7)" : "rgba(88,28,135,0.15)",
+                  boxShadow: filter === cat ? "0 4px 16px rgba(168,85,247,0.3)" : "none",
+                  color: filter === cat ? "white" : "rgba(167,139,250,0.7)",
+                  borderColor: filter === cat ? "transparent" : "rgba(88,28,135,0.3)",
+                }}>
                 {cat}
               </button>
             ))}
           </div>
         )}
 
-        {/* Grid */}
-        {filtered.length === 0 ? (
-          <div className="text-center py-24">
-            <Star size={52} className="mx-auto mb-4 opacity-20" style={{ color: "#a855f7" }} />
-            <p style={{ color: isDark ? "#6d28d9" : "#a78bfa" }}>No services available yet. Check back soon!</p>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
+            <div style={{ width: 40, height: 40, border: "3px solid rgba(124,34,212,0.3)", borderTopColor: "#a855f7", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto" }} />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
+            <Star size={52} style={{ color: "rgba(107,33,168,0.4)", marginBottom: 16 }} />
+            <p style={{ color: "rgba(107,33,168,0.6)" }}>No services available yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((product) => (
-              <div key={product.id}
-                className="group rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1"
-                style={{
-                  background: isDark ? "rgba(26,10,46,0.7)" : "rgba(255,255,255,0.9)",
-                  borderColor: isDark ? "rgba(59,7,100,0.5)" : "rgba(216,180,254,0.5)",
-                  boxShadow: isDark ? "0 4px 30px rgba(0,0,0,0.4)" : "0 4px 20px rgba(147,51,234,0.08)",
-                }}>
-                <div className="flex items-start justify-between mb-5">
-                  <div className="p-3 rounded-xl" style={{ background: "rgba(124,34,212,0.2)", color: "#a855f7" }}>
-                    {product.category ? categoryIcons[product.category] || <Star size={22} /> : <Star size={22} />}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 22 }}>
+            {filtered.map(product => (
+              <div key={product.id} style={{ borderRadius: 20, border: "1px solid rgba(59,7,100,0.4)", padding: "26px", background: "rgba(18,6,36,0.7)", transition: "all 0.3s", display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+                  <div style={{ padding: 10, borderRadius: 12, background: "rgba(124,34,212,0.18)", color: "#a855f7" }}>
+                    {product.category ? icons[product.category] || <Star size={22} /> : <Star size={22} />}
                   </div>
-                  <span className="font-display font-bold text-2xl"
-                    style={{ background: "linear-gradient(135deg,#c084fc,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  <span style={{ fontFamily: "var(--font-cinzel), serif", fontWeight: 700, fontSize: 22, background: "linear-gradient(135deg,#c084fc,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                     {formatPrice(product.price, product.currency)}
                   </span>
                 </div>
-
                 {product.category && (
-                  <span className="inline-block text-xs px-2.5 py-1 rounded-lg mb-3 capitalize"
-                    style={{ background: "rgba(124,34,212,0.2)", color: "#a855f7" }}>
+                  <span style={{ display: "inline-block", fontSize: 11, padding: "4px 12px", borderRadius: 999, background: "rgba(124,34,212,0.18)", color: "#a855f7", textTransform: "capitalize", marginBottom: 12, alignSelf: "flex-start" }}>
                     {product.category}
                   </span>
                 )}
-
-                <h3 className="font-display font-semibold text-xl mb-2" style={{ color: isDark ? "#f3e8ff" : "#3b0764" }}>
-                  {product.name}
-                </h3>
-                <p className="text-sm leading-relaxed mb-6" style={{ color: isDark ? "rgba(167,139,250,0.6)" : "#7c3aed" }}>
-                  {product.description}
-                </p>
-
-                <button onClick={() => handleBuy(product.id)} disabled={buyingId === product.id}
-                  className="w-full py-3.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-60"
-                  style={{ background: "linear-gradient(135deg,#7c22d4,#a855f7)", boxShadow: "0 4px 15px rgba(168,85,247,0.25)" }}>
-                  {buyingId === product.id ? (
-                    <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Redirecting...</>
-                  ) : session ? (
-                    <><ShoppingCart size={16} /> Purchase Now</>
-                  ) : (
-                    <><ShoppingCart size={16} /> Sign in to Purchase</>
-                  )}
+                <h3 style={{ fontFamily: "var(--font-cinzel), serif", fontWeight: 600, fontSize: 18, color: "#f3e8ff", marginBottom: 10 }}>{product.name}</h3>
+                <p style={{ fontSize: 14, lineHeight: 1.65, color: "rgba(167,139,250,0.6)", flex: 1, marginBottom: 22 }}>{product.description}</p>
+                <button onClick={() => handleBuy(product.id)} disabled={!!buyingId}
+                  style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", cursor: buyingId ? "not-allowed" : "pointer", background: "linear-gradient(135deg,#6b21a8,#a855f7)", boxShadow: "0 4px 16px rgba(168,85,247,0.3)", color: "white", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: buyingId ? 0.7 : 1 }}>
+                  {buyingId === product.id ? <><span style={{ width: 15, height: 15, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "white", borderRadius: "50%", animation: "spin 1s linear infinite", display: "inline-block" }} /> Processing…</> : <><ShoppingCart size={16} /> {session ? "Purchase Now" : "Sign in to Buy"}</>}
                 </button>
               </div>
             ))}
           </div>
         )}
       </div>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 }
