@@ -1,24 +1,32 @@
 import type { Metadata } from "next";
+import { Cinzel, Raleway } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+  variable: "--font-cinzel",
+  display: "swap",
+});
+
+const raleway = Raleway({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-raleway",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Mooni Services — Rise of Kingdoms",
   description: "Premium Rise of Kingdoms services. Power leveling, gem farming, alliance support and more.",
+  keywords: ["Rise of Kingdoms", "RoK services", "power leveling", "gems farming"],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Raleway:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body style={{ fontFamily: "var(--font-raleway, 'Raleway', sans-serif)" }}>
+      <body className={`${cinzel.variable} ${raleway.variable}`} style={{ margin: 0, padding: 0 }}>
         <Providers>{children}</Providers>
       </body>
     </html>

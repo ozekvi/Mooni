@@ -53,7 +53,7 @@ export default function ServicesSection({ theme }: { theme: "dark" | "light" }) 
         padding: "120px 24px",
         background: isDark
           ? "linear-gradient(180deg, #09030f 0%, #0f051a 50%, #09030f 100%)"
-          : "linear-gradient(180deg, #f8f5ff 0%, #f3e8ff 50%, #f8f5ff 100%)",
+          : "linear-gradient(180deg, #faf7ff 0%, #f3f0ff 50%, #faf7ff 100%)",
       }}
     >
       {/* bg glow */}
@@ -138,7 +138,7 @@ function ServiceCard({ product, isDark }: { product: Product; isDark: boolean })
         padding: 24,
         background: isDark
           ? "linear-gradient(135deg, rgba(26,10,46,0.85), rgba(15,5,26,0.7))"
-          : "rgba(255,255,255,0.9)",
+          : "rgba(255,255,255,0.95)",
         boxShadow: hovered
           ? "0 8px 40px rgba(124,34,212,0.2)"
           : isDark ? "0 4px 30px rgba(0,0,0,0.4)" : "0 4px 20px rgba(147,51,234,0.08)",

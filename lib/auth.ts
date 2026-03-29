@@ -1,22 +1,29 @@
-import NextAuth from "next-auth";
+import NextAuth, { type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { inviteToDiscordServer, getDiscordUserRoles } from "@/lib/discord";
+
+declare module "next-auth" {
+  interface Session {
+    user: { id: string; role: string; discordId?: string } & DefaultSession["user"];
+  }
+  interface User {
+    role?: string;
+    discordId?: string;
+  }
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  session: { strategy: "jwt" },
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Discord({
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          scope: "identify email guilds",
-        },
-      },
+      authorization: { params: { scope: "identify email guilds.join" } },
     }),
     Credentials({
       credentials: {
@@ -25,130 +32,107 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-
         try {
           const user = await prisma.user.findUnique({
             where: { email: credentials.email as string },
           });
-
           if (!user || !user.password) return null;
           if (!user.emailVerified) throw new Error("EMAIL_NOT_VERIFIED");
-
-          const isValid = await bcrypt.compare(
-            credentials.password as string,
-            user.password
-          );
-
-          if (!isValid) return null;
-
+          const valid = await bcrypt.compare(credentials.password as string, user.password);
+          if (!valid) return null;
           return {
             id: user.id,
             email: user.email ?? undefined,
             name: user.name ?? undefined,
             image: user.image ?? undefined,
             role: user.role,
-            discordId: user.discordId ?? undefined,
           };
-        } catch (error) {
-          if (error instanceof Error && error.message === "EMAIL_NOT_VERIFIED") {
-            throw new Error("EMAIL_NOT_VERIFIED");
-          }
-          console.error("Auth error:", error);
-          return null;
+        } catch (e: any) {
+          throw e;
         }
       },
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider === "discord") {
         try {
-          // Auto-invite to Discord server
-          if (account.access_token && user.id) {
-            await inviteToDiscordServer(account.access_token, user.id);
+          // Try to auto-join server if bot token is set
+          if (process.env.DISCORD_BOT_TOKEN && account.access_token && profile?.id) {
+            await fetch(
+              `https://discord.com/api/v10/guilds/${process.env.DISCORD_GUILD_ID}/members/${profile.id}`,
+              {
+                method: "PUT",
+                headers: {
+                  Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ access_token: account.access_token }),
+              }
+            ).catch(() => {});
           }
-          // Mark email as verified for Discord users
-          if (user.id) {
-            await prisma.user.update({
-              where: { id: user.id },
-              data: { emailVerified: new Date() },
-            });
-          }
-        } catch (error) {
-          console.error("Discord signIn callback error:", error);
-          // Don't block sign in if Discord invite fails
-        }
+        } catch {}
       }
       return true;
     },
-    async session({ session, user, token }) {
-      if (session.user) {
-        const userId = user?.id || token?.sub || "";
-        session.user.id = userId;
-
-        if (userId) {
-          try {
-            const dbUser = await prisma.user.findUnique({
-              where: { id: userId },
-              select: { role: true, discordId: true },
-            });
-
-            if (dbUser) {
-              if (dbUser.discordId) {
-                try {
-                  const isAdmin = await getDiscordUserRoles(dbUser.discordId);
-                  session.user.role = isAdmin ? "admin" : dbUser.role;
-                } catch {
-                  session.user.role = dbUser.role;
-                }
-              } else {
-                session.user.role = dbUser.role;
-              }
-              session.user.discordId = dbUser.discordId ?? undefined;
-            }
-          } catch (error) {
-            console.error("Session callback error:", error);
-            session.user.role = "user";
-          }
-        }
-      }
-      return session;
-    },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, profile }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as { role?: string }).role;
+        token.role = user.role ?? "user";
       }
-      if (account?.provider === "discord" && account.providerAccountId) {
-        token.discordId = account.providerAccountId;
+      if (account?.provider === "discord" && profile) {
+        const discordProfile = profile as any;
+        token.discordId = discordProfile.id;
+        // Check admin role
+        if (process.env.DISCORD_BOT_TOKEN && discordProfile.id) {
+          try {
+            const res = await fetch(
+              `https://discord.com/api/v10/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordProfile.id}`,
+              { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` } }
+            );
+            if (res.ok) {
+              const member = await res.json();
+              if (member.roles?.includes(process.env.DISCORD_ADMIN_ROLE_ID)) {
+                token.role = "admin";
+                await prisma.user.updateMany({
+                  where: { id: user.id as string },
+                  data: { role: "admin" },
+                });
+              }
+            }
+          } catch {}
+        }
+        await prisma.user.updateMany({
+          where: { id: user.id as string },
+          data: {
+            discordId: discordProfile.id,
+            emailVerified: new Date(),
+          },
+        }).catch(() => {});
       }
       return token;
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = (token.role as string) ?? "user";
+        session.user.discordId = token.discordId as string | undefined;
+      }
+      return session;
     },
   },
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
   },
-  session: {
-    strategy: "database",
-  },
   events: {
     async linkAccount({ user, account }) {
       if (account.provider === "discord") {
-        try {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              discordId: account.providerAccountId,
-              emailVerified: new Date(),
-            },
-          });
-        } catch (error) {
-          console.error("linkAccount event error:", error);
-        }
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { emailVerified: new Date() },
+        }).catch(() => {});
       }
     },
   },
-  // Trust the host header for Vercel deployments
-  trustHost: true,
 });
