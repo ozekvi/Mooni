@@ -26,8 +26,8 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Mooni Services — Rise of Kingdoms",
-  description: "Premium Rise of Kingdoms services. Power leveling, gem farming, alliance support and more.",
-  keywords: ["Rise of Kingdoms", "RoK services", "power leveling", "gems farming", "mooni"],
+  description: "Premium Rise of Kingdoms services. Fog exploring, gem farming",
+  keywords: ["Rise of Kingdoms", "RoK services", "Fog exploring", "gems farming", "mooni"],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   openGraph: {
     title: "Mooni Services",

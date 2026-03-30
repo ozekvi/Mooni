@@ -72,7 +72,7 @@ export default function Hero() {
             <span style={{ fontWeight: 700, color: "#c084fc" }}>elite services</span>
           </p>
           <p style={{ fontFamily: "var(--font-space), sans-serif", fontSize: 13, color: "rgba(167,139,250,0.5)", letterSpacing: "0.1em" }}>
-            Power leveling · Gem farming · Alliance support · Custom orders
+           Fog exploring · Gem farming
           </p>
         </div>
 

@@ -12,12 +12,8 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 const defaults: Product[] = [
-  { id: "1", name: "Power Leveling", description: "Rapidly boost your commander levels with our expert farming teams. Reach your target power in record time.", price: 29.99, currency: "usd", category: "leveling" },
-  { id: "2", name: "Gem Farming", description: "Maximize your gem income with daily farming strategies and optimized resource gathering routes.", price: 19.99, currency: "usd", category: "gems" },
-  { id: "3", name: "Alliance Boost", description: "Full alliance support including territory control, rally coordination, and leadership guidance.", price: 49.99, currency: "usd", category: "alliance" },
-  { id: "4", name: "KvK Strategy", description: "Elite Kingdom vs Kingdom preparation and execution strategies from veteran players.", price: 39.99, currency: "usd", category: "pvp" },
-  { id: "5", name: "Troop Training", description: "Optimize your troop composition and training queue for maximum combat effectiveness.", price: 24.99, currency: "usd", category: "defense" },
-  { id: "6", name: "VIP Management", description: "Full account management service with daily tasks, events, and resource optimization.", price: 89.99, currency: "usd", category: "vip" },
+  { id: "1", name: "Gem Farming", description: "Maximize your gem income with daily farming strategies and optimized resource gathering routes.", price: 19.99, currency: "usd", category: "gems" },
+  { id: "2", name: "Fog Exploring", description: "Explore the fog of war and gain valuable information about the enemy.", price: 8, currency: "usd", category: "vip" },
 ];
 
 export default function ServicesSection() {

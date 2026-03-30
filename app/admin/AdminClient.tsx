@@ -314,7 +314,7 @@ export default function AdminClient({ products: init, orders, users: initUsers }
               {formErr && <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,0.1)", border:"1px solid rgba(248,113,113,0.25)", color:"#fca5a5", fontSize:13, marginBottom:16 }}>{formErr}</div>}
               <form onSubmit={handleCreate} style={{ display:"flex", flexDirection:"column", gap:14 }}>
                 {[
-                  { label:"Product Name", field:"name", type:"text", ph:"e.g. Power Leveling Package" },
+                  { label:"Product Name", field:"name", type:"text", ph:"e.g. Fog exploring Package" },
                   { label:"Price (USD)", field:"price", type:"number", ph:"29.99" },
                   { label:"Image URL (optional)", field:"image", type:"url", ph:"https://..." },
                 ].map(({label,field,type,ph}) => (
